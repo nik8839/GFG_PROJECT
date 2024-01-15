@@ -3,5 +3,7 @@ secondly other than distillbert model. Our team tried with several other pretrai
 we tried running pretrained trained on twitter social_media dataset under strng_text_classification folder and finally merging all results for final prediction.
 so we have two folders one for distillbert_model that has a virtual assistance support for mental health . and other only classification and comparing accuracy.
 
+Secondly another solution is  annotation using Roboflow and 3 classifiers(epiglottis,epiglottis larynx and larynx) have been used. After that a custom  real time object detection model has been built by training it using yolov5 model
+
 
 
