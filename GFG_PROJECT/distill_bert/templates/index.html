@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE MENTALLY STRONG</title>
+    <style>
+        html ,body{
+            height: 100%;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color:  #aeeeee;
+        }
+        
+
+
+        .chat-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid #ccc;
+            margin-bottom: 20px; 
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+
+        .chat-body-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: #8BC34A; /* Green Header */
+            color: #fff; /* Change text color to black or a darker color */
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .user {
+            background-color: #4CAF50; /* Green User Message */
+            color: #fff;
+            text-align: right;
+        }
+
+        .bot {
+            background-color: #f0f0f0;
+            color: #000;
+            text-align: left;
+        }
+
+        .chat-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid #ccc;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        #user-input:focus {
+            outline: none;
+        }
+
+        #send-button {
+            background-color: #4CAF50; /* Green Send Button */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .dropdown-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #mindGamesDropdown {
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #playButton {
+            background-color: #2196F3; /* Blue Play Button */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-body-container">
+            <div class="chat-header">
+                <h1>...BE  STRONG....</h1>
+            </div>
+            <div class="chat-body" id="chat-live-body">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="user-input" placeholder="Type your message..." required>
+                <button id="send-button" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userMessage = document.getElementById("user-input").value;
+
+            // Append user message to chat body
+            appendMessage("user", userMessage, "chat-live-body");
+
+            // Make an AJAX request to Flask server for response
+            fetch("/recommendation", {
+                method: "POST",
+                body: new URLSearchParams({ user_input: userMessage }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Append bot's response to chat body
+                appendMessage("bot", data.prediction, "chat-live-body");
+
+                // If show_dropdown is true display the dropdown
+                if (data.show_dropdown ) {
+                    const dropdownDiv = document.createElement("div");
+                    dropdownDiv.className = 'dropdown-container';
+                    dropdownDiv.innerHTML = "<strong>Choose a mind game to play:</strong>" +
+                        "<br><select id='mindGamesDropdown'>" +
+                        "<option value='sudoku'>Sudoku</option>" +
+                        "<option value='chess'>Chess</option>" +
+                        "<option value='ludo'>Ludo</option>" +
+                        "<option value='simon-says'>Simon-Says</option>" +
+                        "<option value='crossword'>CrossWord</option>" +
+                        "<option value='tic-tac-toe'>Tic-Tac-Toe</option>" +
+                        "</select>" +
+                        "<button id='playButton' onclick='goToSelectedMindGame()'>Play Selected Game</button>";
+
+                    // Append the dropdown div to chat body
+                    document.getElementById("chat-live-body").appendChild(dropdownDiv);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+            // Clear the input field
+            document.getElementById("user-input").value = "";
+        }
+
+        function appendMessage(sender, message, targetElementId) {
+            const chatBody = document.getElementById(targetElementId);
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = message;
+            chatBody.appendChild(messageDiv);
+
+            // Scroll to the bottom of the chat body
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function goToSelectedMindGame() {
+            // Get the selected game from the dropdown
+            const selectedGame = document.getElementById("mindGamesDropdown").value.toLowerCase();
+        
+            // Redirect the user to the respective mind game page
+            if (selectedGame === "sudoku") {
+                window.location.href = 'https://sudoku.com/';
+            } else if (selectedGame === "chess") {
+                window.location.href = 'https://www.chess.com/play';
+            } else if (selectedGame === "ludo") {
+                window.location.href = 'https://www.crazygames.com/game/ludo-king';
+            } else if (selectedGame === "simon-says") {
+                window.location.href = 'https://www.mindgames.com/game/Simon+Says';
+            } else if (selectedGame === "crossword") {
+                window.location.href = 'https://www.mindgames.com/game/The+Daily+Commuter+Crossword';
+            } else if (selectedGame === "tic-tac-toe") {
+                window.location.href = 'https://www.mindgames.com/game/Tic+Tac+Toe';
+            }
+        }
+
+
+      
+        
+    </script>
+</body>
+
+</html>
